@@ -29,40 +29,63 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden; /* Prevent any horizontal window scrolling */
         }
 
         header {
             background-color: var(--bg-panel);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
+            padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         header h1 {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: #818cf8;
             font-weight: 700;
-            letter-spacing: -0.5px;
         }
 
+        /* Responsive Main Container: Column on mobile, Row on desktop */
         .main-container {
             display: flex;
+            flex-direction: column;
             flex: 1;
-            height: calc(100vh - 70px);
-            overflow: hidden;
+            width: 100%;
+            height: auto;
+        }
+
+        @media (min-width: 900px) {
+            .main-container {
+                flex-direction: row;
+                height: calc(100vh - 65px);
+                overflow: hidden;
+            }
         }
 
         sidebar {
-            width: 340px;
+            width: 100%;
             background-color: var(--bg-panel);
-            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            padding: 1.5rem;
-            gap: 1.25rem;
+            padding: 1.25rem;
+            gap: 1rem;
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        @media (min-width: 900px) {
+            sidebar {
+                width: 340px;
+                border-bottom: none;
+                border-right: 1px solid var(--border);
+                overflow-y: auto;
+                max-height: calc(100vh - 65px);
+            }
         }
 
         .control-group {
@@ -72,7 +95,7 @@
         }
 
         .control-group label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -92,6 +115,7 @@
             display: inline-flex;
             justify-content: center;
             align-items: center;
+            font-size: 0.9rem;
         }
 
         .btn:hover {
@@ -112,19 +136,24 @@
             background-color: var(--border);
         }
 
+        .btn.active-mode {
+            background-color: #059669;
+            border-color: #059669;
+        }
+
         input[type="file"] {
             display: none;
         }
 
         .file-upload-label {
             border: 2px dashed var(--border);
-            padding: 1.25rem;
+            padding: 1rem;
             border-radius: 6px;
             text-align: center;
             cursor: pointer;
             color: var(--text-muted);
+            font-size: 0.85rem;
             transition: border-color 0.2s, color 0.2s;
-            font-size: 0.9rem;
         }
 
         .file-upload-label:hover {
@@ -139,10 +168,9 @@
         }
 
         .range-value {
-            font-size: 0.8rem;
-            text-align: right;
-            color: var(--text-muted);
+            font-size: 0.75rem;
             float: right;
+            color: var(--text-muted);
         }
 
         .dimension-inputs {
@@ -158,8 +186,10 @@
             padding: 0.5rem;
             border-radius: 6px;
             font-size: 0.9rem;
+            width: 100%;
         }
 
+        /* Workspace & Canvas fit */
         .workspace {
             flex: 1;
             display: flex;
@@ -167,14 +197,22 @@
             align-items: center;
             background: #030712;
             position: relative;
-            overflow: auto;
-            padding: 2rem;
+            padding: 1.5rem;
+            min-height: 350px;
+            overflow: hidden;
+        }
+
+        @media (min-width: 900px) {
+            .workspace {
+                overflow: auto;
+            }
         }
 
         .canvas-wrapper {
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.7);
+            position: relative;
             max-width: 100%;
             max-height: 100%;
+            box-shadow: 0 10px 20px -5px rgb(0 0 0 / 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -182,7 +220,7 @@
 
         canvas {
             max-width: 100%;
-            max-height: 100%;
+            max-height: 60vh;
             object-fit: contain;
             display: block;
             background-image: linear-gradient(45deg, #1f2937 25%, transparent 25%), 
@@ -193,10 +231,17 @@
             background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
         }
 
+        @media (min-width: 900px) {
+            canvas {
+                max-height: 80vh;
+            }
+        }
+
         .placeholder-text {
             color: var(--text-muted);
             text-align: center;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
+            padding: 1rem;
         }
 
         hr {
@@ -213,6 +258,7 @@
     </header>
 
     <div class="main-container">
+        <!-- Sidebar Controls -->
         <sidebar>
             <div class="control-group">
                 <label>Source Image</label>
@@ -223,7 +269,7 @@
             <hr>
 
             <div class="control-group">
-                <label>Resize Canvas</label>
+                <label>Resize Image</label>
                 <div class="dimension-inputs">
                     <input type="number" id="widthInput" placeholder="Width">
                     <input type="number" id="heightInput" placeholder="Height">
@@ -234,10 +280,18 @@
             <hr>
 
             <div class="control-group">
+                <label>Crop Tool</label>
+                <button id="cropModeBtn" class="btn btn-secondary">Enable Crop Mode (Drag Box)</button>
+                <button id="applyCropBtn" class="btn" style="margin-top: 0.4rem; display:none; background-color:#059669;">Confirm Crop Selection</button>
+            </div>
+
+            <hr>
+
+            <div class="control-group">
                 <label>Transform Options</label>
                 <div style="display: flex; gap: 0.5rem;">
                     <button id="rotateBtn" class="btn btn-secondary" style="flex:1;">Rotate 90°</button>
-                    <button id="flipHBtn" class="btn btn-secondary" style="flex:1;">Flip Horizontal</button>
+                    <button id="flipHBtn" class="btn btn-secondary" style="flex:1;">Flip H</button>
                 </div>
             </div>
 
@@ -263,9 +317,10 @@
             <button id="resetBtn" class="btn btn-secondary">Reset Adjustments</button>
         </sidebar>
 
+        <!-- Canvas Workspace -->
         <div class="workspace">
             <div class="placeholder-text" id="placeholder">Upload an image file to launch the Lisopix workspace</div>
-            <div class="canvas-wrapper">
+            <div class="canvas-wrapper" id="canvasWrapper">
                 <canvas id="canvas" style="display:none;"></canvas>
             </div>
         </div>
@@ -283,6 +338,8 @@
         const resizeBtn = document.getElementById('resizeBtn');
         const rotateBtn = document.getElementById('rotateBtn');
         const flipHBtn = document.getElementById('flipHBtn');
+        const cropModeBtn = document.getElementById('cropModeBtn');
+        const applyCropBtn = document.getElementById('applyCropBtn');
 
         const brightnessRange = document.getElementById('brightnessRange');
         const contrastRange = document.getElementById('contrastRange');
@@ -295,6 +352,11 @@
         let originalHeight = 0;
         let rotationAngle = 0;
         let isFlippedH = false;
+
+        // Crop tracking variables
+        let isCropMode = false;
+        let isDragging = false;
+        let startX = 0, startY = 0, endX = 0, endY = 0;
 
         imageUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -316,6 +378,7 @@
                     resetFilters();
                     rotationAngle = 0;
                     isFlippedH = false;
+                    disableCropMode();
 
                     drawImageToCanvas();
                     
@@ -326,9 +389,35 @@
             }
         });
 
-        function drawImageToCanvas() {
+        function drawImageToCanvas(customCropRect = null) {
             let w = parseInt(widthInput.value) || originalWidth;
             let h = parseInt(heightInput.value) || originalHeight;
+
+            if (customCropRect) {
+                // Perform crop operation
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = customCropRect.w;
+                tempCanvas.height = customCropRect.h;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                tempCtx.drawImage(
+                    canvas, 
+                    customCropRect.x, customCropRect.y, customCropRect.w, customCropRect.h, 
+                    0, 0, customCropRect.w, customCropRect.h
+                );
+                
+                img.src = tempCanvas.toDataURL();
+                img.onload = () => {
+                    originalWidth = img.width;
+                    originalHeight = img.height;
+                    widthInput.value = originalWidth;
+                    heightInput.value = originalHeight;
+                    rotationAngle = 0;
+                    isFlippedH = false;
+                    drawImageToCanvas();
+                };
+                return;
+            }
 
             if (rotationAngle === 90 || rotationAngle === 270) {
                 canvas.width = h;
@@ -358,6 +447,72 @@
             ctx.restore();
         }
 
+        // Crop interactivity logic
+        cropModeBtn.addEventListener('click', () => {
+            if (!img.src) return;
+            isCropMode = !isCropMode;
+            if (isCropMode) {
+                cropModeBtn.classList.add('active-mode');
+                cropModeBtn.innerText = "Cancel Crop Mode";
+                applyCropBtn.style.display = 'inline-flex';
+                alert("Crop Mode Active: Click and drag over parts of the image on the canvas to outline your crop area.");
+            } else {
+                disableCropMode();
+                drawImageToCanvas();
+            }
+        });
+
+        function disableCropMode() {
+            isCropMode = false;
+            cropModeBtn.classList.remove('active-mode');
+            cropModeBtn.innerText = "Enable Crop Mode (Drag Box)";
+            applyCropBtn.style.display = 'none';
+            isDragging = false;
+        }
+
+        // Mouse & Touch events for drawing crop boxes on canvas
+        canvas.addEventListener('mousedown', (e) => {
+            if (!isCropMode) return;
+            const rect = canvas.getBoundingClientRect();
+            isDragging = true;
+            startX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            startY = (e.clientY - rect.top) * (canvas.height / rect.height);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isCropMode || !isDragging) return;
+            const rect = canvas.getBoundingClientRect();
+            endX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            endY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            drawImageToCanvas(); // Redraw base
+            
+            // Draw visual selection overlay box
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6]);
+            ctx.strokeRect(startX, startY, endX - startX, endY - startY);
+            ctx.setLineDash([]);
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            if (isCropMode) isDragging = false;
+        });
+
+        applyCropBtn.addEventListener('click', () => {
+            let cropW = Math.abs(endX - startX);
+            let cropH = Math.abs(endY - startY);
+            if (cropW < 10 || cropH < 10) {
+                alert("Please drag a valid selection box first.");
+                return;
+            }
+            let cropX = Math.min(startX, endX);
+            let cropY = Math.min(startY, endY);
+
+            disableCropMode();
+            drawImageToCanvas({ x: cropX, y: cropY, w: cropW, h: cropH });
+        });
+
         resizeBtn.addEventListener('click', () => drawImageToCanvas());
         rotateBtn.addEventListener('click', () => {
             rotationAngle = (rotationAngle + 90) % 360;
@@ -386,17 +541,21 @@
 
         resetBtn.addEventListener('click', () => {
             if (!img.src) return;
+            // Reload initial image source state
+            const reader = new FileReader();
+            // Fallback reset using initial file load data if available or original dimensions
             widthInput.value = originalWidth;
             heightInput.value = originalHeight;
             rotationAngle = 0;
             isFlippedH = false;
+            disableCropMode();
             resetFilters();
             drawImageToCanvas();
         });
 
         downloadBtn.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = `edited-${fileName}`;
+            link.download = `lisopix-edited-${fileName}`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
