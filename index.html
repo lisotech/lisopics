@@ -228,7 +228,7 @@
         }
         .preset-chip:hover { border-color: var(--primary); background: rgba(79, 70, 229, 0.1); }
 
-        /* --- MOBILE SKETCH OVERRIDE --- */
+        /* --- MOBILE PINNED WORKSPACE & SCROLLABLE FEATURES --- */
         @media (max-width: 899px) {
             header {
                 padding: 0.75rem 1rem;
@@ -236,30 +236,41 @@
             header h1 {
                 font-size: 1.2rem;
             }
+            body {
+                overflow-y: auto;
+            }
             .main-container {
                 flex-direction: column;
                 height: auto;
                 overflow: visible;
                 width: 100%;
             }
+            /* Pin workspace at the top */
             .workspace {
                 order: 1;
-                min-height: 250px;
-                padding: 1rem;
-                border-bottom: 1px solid var(--border);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                height: 42vh;
+                min-height: 220px;
+                padding: 0.75rem;
+                border-bottom: 2px solid var(--border);
                 width: 100%;
+                background: #030712;
             }
             canvas {
-                max-height: 40vh;
+                max-height: 38vh;
             }
+            /* Allow sidebar features to scroll freely underneath the pinned picture */
             sidebar {
                 order: 2;
                 width: 100%;
                 border-left: none;
                 max-height: none;
                 overflow-y: visible;
-                padding: 1rem;
-                gap: 1rem;
+                padding: 1.25rem 1rem 3rem 1rem;
+                gap: 1.25rem;
+                background-color: var(--bg-dark);
             }
             .mobile-action-bar {
                 order: 0;
@@ -285,16 +296,15 @@
 
     <header>
         <h1>Lisopix</h1>
-        <!-- Header Download button remains available during editing -->
         <button id="downloadBtnTop" class="btn" style="display:none;">Download</button>
     </header>
 
-    <!-- Mobile Action Bar (Browse button shown only before image is loaded) -->
     <div class="mobile-action-bar" id="mobileActionBar">
         <label for="imageUpload" class="btn btn-secondary" style="margin:0; cursor:pointer;">Browse</label>
     </div>
 
     <div class="main-container">
+        <!-- Pinned Workspace on mobile -->
         <div class="workspace">
             <div class="placeholder-text" id="placeholder">
                 Your picture will show here after you upload it.<br><br>
@@ -305,6 +315,7 @@
             </div>
         </div>
 
+        <!-- Scrollable features sidebar -->
         <sidebar>
             <div class="control-group desktop-upload-group" id="desktopUploadGroup">
                 <label>Source Image</label>
@@ -453,7 +464,6 @@
                     placeholder.style.display = 'none';
                     downloadBtnTop.style.display = 'inline-flex';
                     
-                    // Remove browse/download bar when editing starts
                     if (window.innerWidth < 900) {
                         mobileActionBar.style.display = 'none';
                     }
