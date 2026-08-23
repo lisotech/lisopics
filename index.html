@@ -16,7 +16,6 @@
             --text-muted: #9ca3af;
         }
 
-        /* Strict overflow protection to eliminate left/right shifting on mobile */
         html, body {
             max-width: 100vw;
             overflow-x: hidden;
@@ -39,7 +38,7 @@
             flex-direction: column;
         }
 
-        /* --- DESKTOP LAYOUT (Unchanged side-by-side) --- */
+        /* --- DESKTOP LAYOUT --- */
         header {
             background-color: var(--bg-panel);
             border-bottom: 1px solid var(--border);
@@ -113,7 +112,6 @@
             background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
         }
 
-        /* Common Elements */
         .control-group {
             display: flex;
             flex-direction: column;
@@ -230,7 +228,7 @@
         }
         .preset-chip:hover { border-color: var(--primary); background: rgba(79, 70, 229, 0.1); }
 
-        /* --- MOBILE SKETCH OVERRIDE (Width < 900px) --- *//* Fully responsive without horizontal shift */
+        /* --- MOBILE SKETCH OVERRIDE --- */
         @media (max-width: 899px) {
             header {
                 padding: 0.75rem 1rem;
@@ -272,7 +270,7 @@
                 border-bottom: 1px solid var(--border);
                 width: 100%;
             }
-            .mobile-action-bar label, .mobile-action-bar button {
+            .mobile-action-bar label {
                 flex: 1;
                 margin: 0;
             }
@@ -287,16 +285,16 @@
 
     <header>
         <h1>Lisopix</h1>
+        <!-- Header Download button remains available during editing -->
         <button id="downloadBtnTop" class="btn" style="display:none;">Download</button>
     </header>
 
-    <div class="mobile-action-bar">
+    <!-- Mobile Action Bar (Browse button shown only before image is loaded) -->
+    <div class="mobile-action-bar" id="mobileActionBar">
         <label for="imageUpload" class="btn btn-secondary" style="margin:0; cursor:pointer;">Browse</label>
-        <button id="downloadBtnMobile" class="btn" style="display:none; margin:0;">Download</button>
     </div>
 
     <div class="main-container">
-        <!-- Workspace (Picture on top for mobile phone sketch view) -->
         <div class="workspace">
             <div class="placeholder-text" id="placeholder">
                 Your picture will show here after you upload it.<br><br>
@@ -307,9 +305,8 @@
             </div>
         </div>
 
-        <!-- Sidebar controls -->
         <sidebar>
-            <div class="control-group desktop-upload-group" style="display: block;">
+            <div class="control-group desktop-upload-group" id="desktopUploadGroup">
                 <label>Source Image</label>
                 <label for="imageUpload" class="file-upload-label">Browse Image File</label>
             </div>
@@ -332,7 +329,6 @@
 
             <hr>
 
-            <!-- Brightness Stepper -->
             <div class="control-group">
                 <label>Brightness: <span id="brightnessVal">100%</span></label>
                 <div class="stepper-row">
@@ -342,7 +338,6 @@
                 </div>
             </div>
 
-            <!-- Contrast Stepper -->
             <div class="control-group">
                 <label>Contrast: <span id="contrastVal">100%</span></label>
                 <div class="stepper-row">
@@ -352,7 +347,6 @@
                 </div>
             </div>
 
-            <!-- Saturation Stepper -->
             <div class="control-group">
                 <label>Saturation: <span id="saturationVal">100%</span></label>
                 <div class="stepper-row">
@@ -364,7 +358,6 @@
 
             <hr>
 
-            <!-- Filter Presets from Sketch -->
             <div class="control-group">
                 <label>Filter Presets</label>
                 <div class="presets-grid">
@@ -399,7 +392,8 @@
         const placeholder = document.getElementById('placeholder');
         
         const downloadBtnTop = document.getElementById('downloadBtnTop');
-        const downloadBtnMobile = document.getElementById('downloadBtnMobile');
+        const mobileActionBar = document.getElementById('mobileActionBar');
+        const desktopUploadGroup = document.getElementById('desktopUploadGroup');
 
         const widthInput = document.getElementById('widthInput');
         const heightInput = document.getElementById('heightInput');
@@ -425,8 +419,10 @@
         let isDragging = false;
         let startX = 0, startY = 0, endX = 0, endY = 0;
 
-        if (window.innerWidth < 900) {
-            document.querySelector('.desktop-upload-group').style.display = 'none';
+        if (window.innerWidth >= 900) {
+            desktopUploadGroup.style.display = 'block';
+        } else {
+            desktopUploadGroup.style.display = 'none';
         }
 
         imageUpload.addEventListener('change', (e) => {
@@ -456,7 +452,12 @@
                     canvas.style.display = 'block';
                     placeholder.style.display = 'none';
                     downloadBtnTop.style.display = 'inline-flex';
-                    downloadBtnMobile.style.display = 'inline-flex';
+                    
+                    // Remove browse/download bar when editing starts
+                    if (window.innerWidth < 900) {
+                        mobileActionBar.style.display = 'none';
+                    }
+                    desktopUploadGroup.style.display = 'none';
                 }
             }
         });
@@ -672,15 +673,12 @@
             drawImageToCanvas();
         });
 
-        function downloadImage() {
+        downloadBtnTop.addEventListener('click', () => {
             const link = document.createElement('a');
             link.download = `lisopix-${fileName}`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-        }
-
-        downloadBtnTop.addEventListener('click', downloadImage);
-        downloadBtnMobile.addEventListener('click', downloadImage);
+        });
     </script>
 </body>
 </html>
