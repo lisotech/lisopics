@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lisopix - Online Picture Editor & Resizer</title>
+    <title>ZPIX Editor - Online Picture Editor & Resizer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -71,7 +71,7 @@
         .main-container {
             display: flex;
             flex: 1;
-            height: calc(100vh - 70px - 40px);
+            height: calc(100vh - 70px - 55px);
             overflow: hidden;
             flex-direction: row;
             width: 100%;
@@ -264,14 +264,27 @@
         footer {
             background-color: var(--bg-panel);
             border-top: 1px solid var(--border);
-            height: 40px;
+            height: 55px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             width: 100%;
             z-index: 10;
+            gap: 2px;
+        }
+
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        footer a:hover {
+            color: var(--primary);
+            text-decoration: underline;
         }
 
         /* Floating Widgets Container (Right-Center) */
@@ -321,7 +334,7 @@
 
         /* WhatsApp Styles */
         .whatsapp-float {
-            background-color: #064e3b; /* Dark Green */
+            background-color: #064e3b;
             color: #ffffff;
         }
         .whatsapp-float:hover {
@@ -331,7 +344,7 @@
 
         /* Telegram Styles */
         .telegram-float {
-            background-color: #0088cc; /* Telegram Blue */
+            background-color: #0088cc;
             color: #ffffff;
         }
         .telegram-float:hover {
@@ -389,7 +402,7 @@
 <body>
 
     <header>
-        <h1>Lisopix</h1>
+        <h1>ZPIX Editor</h1>
         <button id="downloadBtnTop" class="btn" style="display:none;">Download</button>
     </header>
 
@@ -398,7 +411,7 @@
     </div>
 
     <div class="main-container">
-        <!-- Workspace (Picture on left) -->
+        <!-- Workspace -->
         <div class="workspace">
             <div class="placeholder-text" id="placeholder">
                 Your picture will show here after you upload it.<br><br>
@@ -409,7 +422,7 @@
             </div>
         </div>
 
-        <!-- Sidebar controls (Features on right) -->
+        <!-- Sidebar controls -->
         <sidebar>
             <div class="control-group desktop-upload-group" id="desktopUploadGroup" style="display: block;">
                 <label>Source Image</label>
@@ -501,7 +514,8 @@
     </div>
 
     <footer>
-        &copy; 2026 Lisopix. All rights reserved.
+        <div>ZPIX Editor || All rights reserved</div>
+        <div>Powered by <a href="https://lisotech.org" target="_blank">LISOTECH</a></div>
     </footer>
 
     <!-- Floating Right-Center Social & Theme Icons Container -->
@@ -551,7 +565,7 @@
         const themeIcon = document.getElementById('themeIcon');
 
         let img = new Image();
-        let fileName = 'lisopix-image.png';
+        let fileName = 'zpix-image.png';
         let originalWidth = 0;
         let originalHeight = 0;
         let rotationAngle = 0;
@@ -856,7 +870,7 @@
 
         downloadBtnTop.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = `lisopix-${fileName}`;
+            link.download = `zpix-${fileName}`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
