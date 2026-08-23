@@ -58,9 +58,9 @@
         .main-container {
             display: flex;
             flex: 1;
-            height: calc(100vh - 70px - 40px); /* Account for header and footer heights */
+            height: calc(100vh - 70px - 40px);
             overflow: hidden;
-            flex-direction: row; /* Workspace left, Sidebar right */
+            flex-direction: row;
             width: 100%;
         }
 
@@ -112,7 +112,6 @@
             background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
         }
 
-        /* Common Elements */
         .control-group {
             display: flex;
             flex-direction: column;
@@ -249,7 +248,6 @@
         }
         .preset-chip:hover { border-color: var(--primary); background: rgba(79, 70, 229, 0.1); }
 
-        /* Footer Style */
         footer {
             background-color: var(--bg-panel);
             border-top: 1px solid var(--border);
@@ -263,14 +261,19 @@
             z-index: 10;
         }
 
-        /* Floating Right-Center Dark Green WhatsApp Icon */
-        .whatsapp-float {
+        /* Floating Widgets Container (Right-Center) */
+        .social-float-container {
             position: fixed;
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            background-color: #064e3b; /* Dark Green */
-            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .social-float {
             width: 42px;
             height: 42px;
             border-radius: 50%;
@@ -278,21 +281,35 @@
             justify-content: center;
             align-items: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            z-index: 1000;
             text-decoration: none;
             transition: transform 0.2s, background-color 0.2s;
         }
-        .whatsapp-float:hover {
-            background-color: #065f46;
-            transform: translateY(-50%) scale(1.1);
-        }
-        .whatsapp-float svg {
+        .social-float svg {
             width: 22px;
             height: 22px;
             fill: currentColor;
         }
 
-        /* --- MOBILE LAYOUT OVERRIDE (Width < 900px) --- */
+        /* WhatsApp Styles */
+        .whatsapp-float {
+            background-color: #064e3b; /* Dark Green */
+            color: #ffffff;
+        }
+        .whatsapp-float:hover {
+            background-color: #065f46;
+            transform: scale(1.1);
+        }
+
+        /* Telegram Styles */
+        .telegram-float {
+            background-color: #0088cc; /* Telegram Blue */
+            color: #ffffff;
+        }
+        .telegram-float:hover {
+            background-color: #0099e6;
+            transform: scale(1.1);
+        }
+
         @media (max-width: 899px) {
             header { padding: 0.75rem 1rem; }
             header h1 { font-size: 1.2rem; }
@@ -458,12 +475,21 @@
         &copy; 2026 Lisopix. All rights reserved.
     </footer>
 
-    <!-- Floating Right-Center WhatsApp Icon -->
-    <a href="https://wa.me/260974101130" class="whatsapp-float" target="_blank" title="Chat on WhatsApp">
-        <svg viewBox="0 0 24 24">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-        </svg>
-    </a>
+    <!-- Floating Right-Center Social Icons Container -->
+    <div class="social-float-container">
+        <!-- WhatsApp Icon -->
+        <a href="https://wa.me/260974101130" class="social-float whatsapp-float" target="_blank" title="Chat on WhatsApp">
+            <svg viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+            </svg>
+        </a>
+        <!-- Telegram Icon -->
+        <a href="https://t.me/+260974101130" class="social-float telegram-float" target="_blank" title="Chat on Telegram">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.14-.26.26-.534.26l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.195 1.006.131.832.943z"/>
+            </svg>
+        </a>
+    </div>
 
     <script>
         const imageUpload = document.getElementById('imageUpload');
@@ -531,7 +557,6 @@
                     canvas.style.display = 'block';
                     placeholder.style.display = 'none';
                     
-                    // Hide browse elements and keep only top header download button
                     downloadBtnTop.style.display = 'inline-flex';
                     if (mobileActionBar) mobileActionBar.style.display = 'none';
                     if (desktopUploadGroup) desktopUploadGroup.style.display = 'none';
