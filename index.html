@@ -164,7 +164,6 @@
             color: var(--text-main);
         }
         .btn-secondary:hover { background-color: var(--border); }
-        .btn.active-mode { background-color: #059669; border-color: #059669; }
 
         input[type="file"] { display: none; }
 
@@ -419,7 +418,7 @@
             <input type="file" id="imageUpload" accept="image/*">
 
             <div class="control-group">
-                <label>Resize & Crop</label>
+                <label>Resize</label>
                 <div class="dimension-inputs">
                     <input type="number" id="widthInput" placeholder="Width">
                     <input type="number" id="heightInput" placeholder="Height">
@@ -430,11 +429,7 @@
                     <button class="aspect-btn" onclick="setAspect('4:3', event)">4:3</button>
                     <button class="aspect-btn" onclick="setAspect('16:9', event)">16:9</button>
                 </div>
-                <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem; width: 100%;">
-                    <button id="resizeBtn" class="btn btn-secondary" style="flex:1;">Apply Size</button>
-                    <button id="cropModeBtn" class="btn btn-secondary" style="flex:1;">Crop Tool</button>
-                </div>
-                <button id="applyCropBtn" class="btn" style="margin-top: 0.4rem; display:none; background-color:#059669; width:100%;">Confirm Crop</button>
+                <button id="resizeBtn" class="btn btn-secondary" style="margin-top: 0.4rem; width: 100%;">Apply Size</button>
             </div>
 
             <hr>
@@ -537,8 +532,6 @@
         const resizeBtn = document.getElementById('resizeBtn');
         const rotateBtn = document.getElementById('rotateBtn');
         const flipHBtn = document.getElementById('flipHBtn');
-        const cropModeBtn = document.getElementById('cropModeBtn');
-        const applyCropBtn = document.getElementById('applyCropBtn');
 
         const brightnessRange = document.getElementById('brightnessRange');
         const contrastRange = document.getElementById('contrastRange');
@@ -549,15 +542,11 @@
         const themeIcon = document.getElementById('themeIcon');
 
         let img = new Image();
-        let fileName = 'zpix-image.png';
+        let fileName = 'zpix-editor.png';
         let originalWidth = 0;
         let originalHeight = 0;
         let rotationAngle = 0;
         let isFlippedH = false;
-
-        let isCropMode = false;
-        let isDragging = false;
-        let startX = 0, startY = 0, endX = 0, endY = 0;
         let currentAspect = 'free';
 
         // Theme Toggle Logic
@@ -575,7 +564,6 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            fileName = file.name;
             const reader = new FileReader();
             reader.readAsDataURL(file);
 
@@ -591,7 +579,6 @@
                     resetFilters();
                     rotationAngle = 0;
                     isFlippedH = false;
-                    disableCropMode();
 
                     drawImageToCanvas();
                     
@@ -624,34 +611,9 @@
             drawImageToCanvas();
         }
 
-        function drawImageToCanvas(customCropRect = null) {
+        function drawImageToCanvas() {
             let w = parseInt(widthInput.value) || originalWidth;
             let h = parseInt(heightInput.value) || originalHeight;
-
-            if (customCropRect) {
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = customCropRect.w;
-                tempCanvas.height = customCropRect.h;
-                const tempCtx = tempCanvas.getContext('2d');
-                
-                tempCtx.drawImage(
-                    canvas, 
-                    customCropRect.x, customCropRect.y, customCropRect.w, customCropRect.h, 
-                    0, 0, customCropRect.w, customCropRect.h
-                );
-                
-                img.src = tempCanvas.toDataURL();
-                img.onload = () => {
-                    originalWidth = img.width;
-                    originalHeight = img.height;
-                    widthInput.value = originalWidth;
-                    heightInput.value = originalHeight;
-                    rotationAngle = 0;
-                    isFlippedH = false;
-                    drawImageToCanvas();
-                };
-                return;
-            }
 
             if (rotationAngle === 90 || rotationAngle === 270) {
                 canvas.width = h;
@@ -744,80 +706,6 @@
             updateFilterLabelsAndCanvas();
         }
 
-        cropModeBtn.addEventListener('click', () => {
-            if (!img.src) return;
-            isCropMode = !isCropMode;
-            if (isCropMode) {
-                cropModeBtn.classList.add('active-mode');
-                cropModeBtn.innerText = "Cancel Crop";
-                applyCropBtn.style.display = 'inline-flex';
-                alert("Crop Mode Active: Click and drag over your picture on the canvas to outline the crop region.");
-            } else {
-                disableCropMode();
-                drawImageToCanvas();
-            }
-        });
-
-        function disableCropMode() {
-            isCropMode = false;
-            cropModeBtn.classList.remove('active-mode');
-            cropModeBtn.innerText = "Crop Tool";
-            applyCropBtn.style.display = 'none';
-            isDragging = false;
-        }
-
-        canvas.addEventListener('mousedown', (e) => {
-            if (!isCropMode) return;
-            const rect = canvas.getBoundingClientRect();
-            isDragging = true;
-            startX = (e.clientX - rect.left) * (canvas.width / rect.width);
-            startY = (e.clientY - rect.top) * (canvas.height / rect.height);
-        });
-
-        canvas.addEventListener('mousemove', (e) => {
-            if (!isCropMode || !isDragging) return;
-            const rect = canvas.getBoundingClientRect();
-            endX = (e.clientX - rect.left) * (canvas.width / rect.width);
-            endY = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-            if (currentAspect === '1:1') {
-                let diff = Math.abs(endX - startX);
-                endY = startY + (endY > startY ? diff : -diff);
-            } else if (currentAspect === '4:3') {
-                let diffX = endX - startX;
-                endY = startY + (diffX * 3) / 4;
-            } else if (currentAspect === '16:9') {
-                let diffX = endX - startX;
-                endY = startY + (diffX * 9) / 16;
-            }
-
-            drawImageToCanvas(); 
-            
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([6]);
-            ctx.strokeRect(startX, startY, endX - startX, endY - startY);
-            ctx.setLineDash([]);
-        });
-
-        canvas.addEventListener('mouseup', () => {
-            if (isCropMode) isDragging = false;
-        });
-
-        applyCropBtn.addEventListener('click', () => {
-            let cropW = Math.abs(endX - startX);
-            let cropH = Math.abs(endY - startY);
-            if (cropW < 10 || cropH < 10) {
-                alert("Please drag a selection box on the image first.");
-                return;
-            }
-            let cropX = Math.min(startX, endX);
-            let cropY = Math.min(startY, endY);
-
-            disableCropMode();
-            drawImageToCanvas({ x: cropX, y: cropY, w: cropW, h: cropH });
-        });
-
         resizeBtn.addEventListener('click', () => drawImageToCanvas());
         rotateBtn.addEventListener('click', () => {
             rotationAngle = (rotationAngle + 90) % 360;
@@ -841,14 +729,13 @@
             heightInput.value = originalHeight;
             rotationAngle = 0;
             isFlippedH = false;
-            disableCropMode();
             resetFilters();
             drawImageToCanvas();
         });
 
         downloadBtnTop.addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = `zpix-${fileName}`;
+            link.download = 'zpix-editor.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
