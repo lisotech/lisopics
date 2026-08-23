@@ -29,7 +29,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden; /* Prevent any horizontal window scrolling */
+            overflow-x: hidden;
         }
 
         header {
@@ -49,18 +49,17 @@
             font-weight: 700;
         }
 
-        /* Responsive Main Container: Column on mobile, Row on desktop */
+        /* Main Container: Mobile puts workspace on TOP, sidebar below */
         .main-container {
             display: flex;
             flex-direction: column;
             flex: 1;
             width: 100%;
-            height: auto;
         }
 
         @media (min-width: 900px) {
             .main-container {
-                flex-direction: row;
+                flex-direction: row-reverse; /* On desktop, sidebar goes right, workspace left */
                 height: calc(100vh - 65px);
                 overflow: hidden;
             }
@@ -69,19 +68,17 @@
         sidebar {
             width: 100%;
             background-color: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
+            border-top: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             padding: 1.25rem;
             gap: 1rem;
-            max-height: none;
-            overflow-y: visible;
         }
 
         @media (min-width: 900px) {
             sidebar {
                 width: 340px;
-                border-bottom: none;
+                border-top: none;
                 border-right: 1px solid var(--border);
                 overflow-y: auto;
                 max-height: calc(100vh - 65px);
@@ -189,7 +186,7 @@
             width: 100%;
         }
 
-        /* Workspace & Canvas fit */
+        /* Workspace & Canvas on top */
         .workspace {
             flex: 1;
             display: flex;
@@ -198,13 +195,15 @@
             background: #030712;
             position: relative;
             padding: 1.5rem;
-            min-height: 350px;
+            min-height: 320px;
             overflow: hidden;
+            border-bottom: 1px solid var(--border);
         }
 
         @media (min-width: 900px) {
             .workspace {
                 overflow: auto;
+                border-bottom: none;
             }
         }
 
@@ -220,7 +219,7 @@
 
         canvas {
             max-width: 100%;
-            max-height: 60vh;
+            max-height: 50vh;
             object-fit: contain;
             display: block;
             background-image: linear-gradient(45deg, #1f2937 25%, transparent 25%), 
@@ -317,7 +316,7 @@
             <button id="resetBtn" class="btn btn-secondary">Reset Adjustments</button>
         </sidebar>
 
-        <!-- Canvas Workspace -->
+        <!-- Canvas Workspace (Positioned on Top for Mobile) -->
         <div class="workspace">
             <div class="placeholder-text" id="placeholder">Upload an image file to launch the Lisopix workspace</div>
             <div class="canvas-wrapper" id="canvasWrapper">
@@ -353,7 +352,6 @@
         let rotationAngle = 0;
         let isFlippedH = false;
 
-        // Crop tracking variables
         let isCropMode = false;
         let isDragging = false;
         let startX = 0, startY = 0, endX = 0, endY = 0;
@@ -394,7 +392,6 @@
             let h = parseInt(heightInput.value) || originalHeight;
 
             if (customCropRect) {
-                // Perform crop operation
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = customCropRect.w;
                 tempCanvas.height = customCropRect.h;
@@ -447,7 +444,6 @@
             ctx.restore();
         }
 
-        // Crop interactivity logic
         cropModeBtn.addEventListener('click', () => {
             if (!img.src) return;
             isCropMode = !isCropMode;
@@ -470,7 +466,6 @@
             isDragging = false;
         }
 
-        // Mouse & Touch events for drawing crop boxes on canvas
         canvas.addEventListener('mousedown', (e) => {
             if (!isCropMode) return;
             const rect = canvas.getBoundingClientRect();
@@ -485,9 +480,8 @@
             endX = (e.clientX - rect.left) * (canvas.width / rect.width);
             endY = (e.clientY - rect.top) * (canvas.height / rect.height);
 
-            drawImageToCanvas(); // Redraw base
+            drawImageToCanvas(); 
             
-            // Draw visual selection overlay box
             ctx.strokeStyle = '#38bdf8';
             ctx.lineWidth = 2;
             ctx.setLineDash([6]);
@@ -541,9 +535,6 @@
 
         resetBtn.addEventListener('click', () => {
             if (!img.src) return;
-            // Reload initial image source state
-            const reader = new FileReader();
-            // Fallback reset using initial file load data if available or original dimensions
             widthInput.value = originalWidth;
             heightInput.value = originalHeight;
             rotationAngle = 0;
