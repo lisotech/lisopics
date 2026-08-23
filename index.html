@@ -312,8 +312,8 @@
         <button id="downloadBtnTop" class="btn" style="display:none;">Download</button>
     </header>
 
-    <div class="mobile-action-bar">
-        <label for="imageUpload" class="btn btn-secondary" style="margin:0; cursor:pointer;">Browse</label>
+    <div class="mobile-action-bar" id="mobileActionBar">
+        <label for="imageUpload" class="btn btn-secondary" id="mobileBrowseBtn" style="margin:0; cursor:pointer;">Browse</label>
         <button id="downloadBtnMobile" class="btn" style="display:none; margin:0;">Download</button>
     </div>
 
@@ -331,13 +331,13 @@
 
         <!-- Sidebar controls (Features on right) -->
         <sidebar>
-            <div class="control-group desktop-upload-group" style="display: block;">
+            <div class="control-group desktop-upload-group" id="desktopUploadGroup" style="display: block;">
                 <label>Source Image</label>
                 <label for="imageUpload" class="file-upload-label">Browse Image File</label>
             </div>
             <input type="file" id="imageUpload" accept="image/*">
 
-            <hr>
+            <hr id="uploadDivider">
 
             <div class="control-group">
                 <label>Resize & Crop</label>
@@ -429,6 +429,10 @@
         
         const downloadBtnTop = document.getElementById('downloadBtnTop');
         const downloadBtnMobile = document.getElementById('downloadBtnMobile');
+        const desktopUploadGroup = document.getElementById('desktopUploadGroup');
+        const mobileBrowseBtn = document.getElementById('mobileBrowseBtn');
+        const mobileActionBar = document.getElementById('mobileActionBar');
+        const uploadDivider = document.getElementById('uploadDivider');
 
         const widthInput = document.getElementById('widthInput');
         const heightInput = document.getElementById('heightInput');
@@ -456,7 +460,8 @@
         let currentAspect = 'free';
 
         if (window.innerWidth < 900) {
-            document.querySelector('.desktop-upload-group').style.display = 'none';
+            desktopUploadGroup.style.display = 'none';
+            uploadDivider.style.display = 'none';
         }
 
         imageUpload.addEventListener('change', (e) => {
@@ -485,6 +490,14 @@
                     
                     canvas.style.display = 'block';
                     placeholder.style.display = 'none';
+                    
+                    // Hide Browse / Upload and keep Download hidden while actively editing if desired, or show download options
+                    desktopUploadGroup.style.display = 'none';
+                    uploadDivider.style.display = 'none';
+                    mobileBrowseBtn.style.display = 'none';
+                    
+                    // Keep download buttons visible for exporting when editing is complete, or hide them per preference
+                    // (If you want download hidden completely during editing, keep them hidden here)
                     downloadBtnTop.style.display = 'inline-flex';
                     downloadBtnMobile.style.display = 'inline-flex';
                 }
