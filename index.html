@@ -169,17 +169,20 @@
         input[type="file"] { display: none; }
 
         .file-upload-label {
-            border: 2px dashed var(--border);
-            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
             border-radius: 6px;
-            text-align: center;
+            font-weight: 600;
             cursor: pointer;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            display: block;
-            width: 100%;
+            text-align: center;
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            transition: background 0.2s;
         }
-        .file-upload-label:hover { border-color: var(--primary); color: var(--text-main); }
+        .file-upload-label:hover { background-color: var(--primary-hover); }
 
         .dimension-inputs { display: flex; gap: 0.5rem; width: 100%; }
         .dimension-inputs input {
@@ -213,11 +216,18 @@
         .aspect-btn:hover { border-color: var(--primary); background: rgba(79, 70, 229, 0.1); }
         .aspect-btn.active-ratio { background: var(--primary); border-color: var(--primary); color: white; }
 
+        .placeholder-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+        }
+
         .placeholder-text {
             color: var(--text-muted);
-            text-align: center;
             font-size: 1rem;
-            padding: 1rem;
         }
 
         hr { border: none; border-top: 1px solid var(--border); width: 100%; }
@@ -379,23 +389,6 @@
                 padding: 1rem;
                 gap: 1rem;
             }
-            .mobile-action-bar {
-                order: 0;
-                display: flex;
-                gap: 0.5rem;
-                padding: 0.5rem 1rem;
-                background: var(--bg-panel);
-                border-bottom: 1px solid var(--border);
-                width: 100%;
-            }
-            .mobile-action-bar label {
-                flex: 1;
-                margin: 0;
-            }
-        }
-
-        @media (min-width: 900px) {
-            .mobile-action-bar { display: none; }
         }
     </style>
 </head>
@@ -406,16 +399,15 @@
         <button id="downloadBtnTop" class="btn" style="display:none;">Download</button>
     </header>
 
-    <div class="mobile-action-bar" id="mobileActionBar">
-        <label for="imageUpload" class="btn btn-secondary" style="margin:0; cursor:pointer;">Browse</label>
-    </div>
-
     <div class="main-container">
         <!-- Workspace -->
         <div class="workspace">
-            <div class="placeholder-text" id="placeholder">
-                Your picture will show here after you upload it.<br><br>
-                <span style="font-size: 0.85rem; color: var(--text-muted);">Let us do some magic ✨</span>
+            <div class="placeholder-container" id="placeholderContainer">
+                <label for="imageUpload" class="file-upload-label">Browse Image File</label>
+                <div class="placeholder-text" id="placeholder">
+                    Your picture will show here after you upload it.<br><br>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Let us do some magic ✨</span>
+                </div>
             </div>
             <div class="canvas-wrapper">
                 <canvas id="canvas" style="display:none;"></canvas>
@@ -424,13 +416,7 @@
 
         <!-- Sidebar controls -->
         <sidebar>
-            <div class="control-group desktop-upload-group" id="desktopUploadGroup" style="display: block;">
-                <label>Source Image</label>
-                <label for="imageUpload" class="file-upload-label">Browse Image File</label>
-            </div>
             <input type="file" id="imageUpload" accept="image/*">
-
-            <hr>
 
             <div class="control-group">
                 <label>Resize & Crop</label>
@@ -542,11 +528,9 @@
         const imageUpload = document.getElementById('imageUpload');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const placeholder = document.getElementById('placeholder');
+        const placeholderContainer = document.getElementById('placeholderContainer');
         
         const downloadBtnTop = document.getElementById('downloadBtnTop');
-        const mobileActionBar = document.getElementById('mobileActionBar');
-        const desktopUploadGroup = document.getElementById('desktopUploadGroup');
 
         const widthInput = document.getElementById('widthInput');
         const heightInput = document.getElementById('heightInput');
@@ -587,10 +571,6 @@
             }
         });
 
-        if (window.innerWidth < 900) {
-            desktopUploadGroup.style.display = 'none';
-        }
-
         imageUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -616,11 +596,9 @@
                     drawImageToCanvas();
                     
                     canvas.style.display = 'block';
-                    placeholder.style.display = 'none';
+                    placeholderContainer.style.display = 'none';
                     
                     downloadBtnTop.style.display = 'inline-flex';
-                    if (mobileActionBar) mobileActionBar.style.display = 'none';
-                    if (desktopUploadGroup) desktopUploadGroup.style.display = 'none';
                 }
             }
         });
