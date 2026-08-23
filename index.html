@@ -14,6 +14,18 @@
             --border: #1f2937;
             --text-main: #f9fafb;
             --text-muted: #9ca3af;
+            --workspace-bg: #030712;
+        }
+
+        [data-theme="light"] {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-dark: #f3f4f6;
+            --bg-panel: #ffffff;
+            --border: #e5e7eb;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --workspace-bg: #e5e7eb;
         }
 
         html, body {
@@ -28,6 +40,7 @@
             padding: 0;
             font-family: 'Inter', sans-serif;
             max-width: 100%;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
         }
 
         body {
@@ -53,6 +66,30 @@
             font-size: 1.5rem;
             color: #818cf8;
             font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .theme-toggle-btn:hover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.1);
         }
 
         .main-container {
@@ -82,7 +119,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #030712;
+            background: var(--workspace-bg);
             position: relative;
             overflow: auto;
             padding: 2rem;
@@ -90,7 +127,7 @@
         }
 
         .canvas-wrapper {
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.7);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2);
             max-width: 100%;
             max-height: 100%;
             display: flex;
@@ -104,10 +141,10 @@
             max-height: 75vh;
             object-fit: contain;
             display: block;
-            background-image: linear-gradient(45deg, #1f2937 25%, transparent 25%), 
-                              linear-gradient(-45deg, #1f2937 25%, transparent 25%), 
-                              linear-gradient(45deg, transparent 75%, #1f2937 75%), 
-                              linear-gradient(-45deg, transparent 75%, #1f2937 75%);
+            background-image: linear-gradient(45deg, var(--border) 25%, transparent 25%), 
+                              linear-gradient(-45deg, var(--border) 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, var(--border) 75%), 
+                              linear-gradient(-45deg, transparent 75%, var(--border) 75%);
             background-size: 16px 16px;
             background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
         }
@@ -173,7 +210,7 @@
             flex: 1;
             background: var(--bg-dark);
             border: 1px solid var(--border);
-            color: white;
+            color: var(--text-main);
             padding: 0.5rem;
             border-radius: 6px;
             font-size: 0.9rem;
@@ -198,7 +235,7 @@
             text-align: center;
         }
         .aspect-btn:hover { border-color: var(--primary); background: rgba(79, 70, 229, 0.1); }
-        .aspect-btn.active-ratio { background: var(--primary); border-color: var(--primary); }
+        .aspect-btn.active-ratio { background: var(--primary); border-color: var(--primary); color: white; }
 
         .placeholder-text {
             color: var(--text-muted);
@@ -218,7 +255,7 @@
         }
         .stepper-btn {
             background: var(--border);
-            color: white;
+            color: var(--text-main);
             border: none;
             width: 32px;
             height: 32px;
@@ -227,7 +264,7 @@
             cursor: pointer;
             flex-shrink: 0;
         }
-        .stepper-btn:hover { background: var(--primary); }
+        .stepper-btn:hover { background: var(--primary); color: white; }
 
         .presets-grid {
             display: grid;
@@ -261,7 +298,6 @@
             z-index: 10;
         }
 
-        /* Floating Widgets Container (Right-Center) */
         .social-float-container {
             position: fixed;
             right: 15px;
@@ -280,7 +316,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             text-decoration: none;
             transition: transform 0.2s, background-color 0.2s;
         }
@@ -290,9 +326,8 @@
             fill: currentColor;
         }
 
-        /* WhatsApp Styles */
         .whatsapp-float {
-            background-color: #064e3b; /* Dark Green */
+            background-color: #064e3b;
             color: #ffffff;
         }
         .whatsapp-float:hover {
@@ -300,9 +335,8 @@
             transform: scale(1.1);
         }
 
-        /* Telegram Styles */
         .telegram-float {
-            background-color: #0088cc; /* Telegram Blue */
+            background-color: #0088cc;
             color: #ffffff;
         }
         .telegram-float:hover {
@@ -357,11 +391,14 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
     <header>
         <h1>Lisopix</h1>
-        <button id="downloadBtnTop" class="btn" style="display:none;">Download</button>
+        <div class="header-actions">
+            <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Light/Dark Mode">☀️</button>
+            <button id="downloadBtnTop" class="btn" style="display:none;">Download</button>
+        </div>
     </header>
 
     <div class="mobile-action-bar" id="mobileActionBar">
@@ -373,7 +410,7 @@
         <div class="workspace">
             <div class="placeholder-text" id="placeholder">
                 Your picture will show here after you upload it.<br><br>
-                <span style="font-size: 0.85rem; color: #6b7280;">Let us do some magic ✨</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Let us do some magic ✨</span>
             </div>
             <div class="canvas-wrapper">
                 <canvas id="canvas" style="display:none;"></canvas>
@@ -492,6 +529,20 @@
     </div>
 
     <script>
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const bodyElement = document.body;
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = bodyElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                bodyElement.setAttribute('data-theme', 'light');
+                themeToggleBtn.innerText = '🌙';
+            } else {
+                bodyElement.setAttribute('data-theme', 'dark');
+                themeToggleBtn.innerText = '☀️';
+            }
+        });
+
         const imageUpload = document.getElementById('imageUpload');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
